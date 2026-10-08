@@ -99,17 +99,30 @@ description: AI 导师学习法——把当前会话变成私人导师：先摸�
 
 不绑定特定工具，按以下顺序检测后端，检测到哪个用哪个：
 
-### 后端检测（首次需要读写笔记时执行一次）
+### 配置与后端解析（首次需要读写笔记时执行一次）
 
-1. **Obsidian**：运行 `obsidian help` 成功 → 用 Obsidian CLI 读写（要求用户的 Obsidian 正在运行）；
-2. **本地 markdown 目录**：用户给出任何笔记目录路径（ vault、Notion/语雀导出目录都行）→ 用文件搜索（grep/Glob）+ Read/Write 直接操作；
-3. **无后端**：不硬找。降级为会话内档案——输出文本，让用户自己保存。绝不因为"没有笔记系统"而拒绝教学。
+**配置读取**：读本 skill 目录下的 `config.json`（用户自定义知识库的入口，字段说明见 `config.example.json`）。没有该文件就按默认值走自动检测，并可在合适时机告诉用户"可以用 config.json 固定笔记库设置"。
+
+**优先级**（高→低）：会话内用户口头指定（如"这次存到 D:\notes"或"这次别写库"）→ config.json → 自动检测。口头指定仅本次会话生效，不改文件、不覆盖 config。
+
+**后端解析**（按 config 的 `backend` 字段）：
+
+1. `obsidian`（或 auto 检测到 Obsidian CLI 可用）：用 Obsidian CLI 读写（要求 Obsidian 运行中）。config 填了 `vault` 名时，**所有命令都带 `vault="名"` 前缀**——多 vault 环境下不带会写进"最近聚焦"的库；填了 `folder` 时，档案和验收笔记都写入该文件夹。命令语法为键值对形式：
+   ```
+   obsidian vault="MyVault" read file="学习档案-Docker"
+   obsidian vault="MyVault" create name="成长/学习/学习档案-Docker" content="..." silent
+   obsidian vault="MyVault" append file="学习档案-Docker" content="..."
+   ```
+2. `directory`（或 auto 且 config/用户提供了目录路径）：任何本地 markdown 目录（Obsidian vault 直读、Notion/语雀导出目录都行）→ 用文件搜索（grep/Glob）+ Read/Write 直接操作；
+3. `none` / 都不可用：降级为会话内档案——输出文本，让用户自己保存。绝不因为"没有笔记系统"而拒绝教学。
+
+**写入行为**由 `auto_write` 控制：`true`（默认）直接写入并一句话告知；`false` 先把要写的内容完整展示，用户确认后才写。
 
 检测和写入失败时静默降级到下一级，不打断教学流程。
 
 ### 自动记笔记（记什么、怎么记）
 
-- **学习档案**：会话结束自动保存/更新到笔记库，文件名固定为 `学习档案-<课题>`（幂等，下次直接找到续写）。Obsidian 用 `obsidian create/append`，目录模式直接 Write。
+- **学习档案**：会话结束自动保存/更新到笔记库，文件名固定为 `学习档案-<课题>`（幂等，下次直接找到续写）。Obsidian 用 `obsidian create/append`（按配置带 `vault=` 前缀），目录模式直接 Write；config 指定了 `folder` 就统一存入该文件夹。
 - **验收笔记（只记通过复述验收的知识点）**：以"能脱稿讲"的形式记——一句话定义 + 一个例子 + 一个易错点，不抄长文。没验收过的点**不记**，防止知识库变成新的"收藏≠学过"。
 - 写入后用一句话告知用户存到了哪，保持透明。
 - 频率克制：一节课合记 1 篇，不逐知识点刷屏建文件。

@@ -65,8 +65,31 @@ git clone https://github.com/GA1st/ai-tutor ~/.claude/skills/ai-tutor
 
 安装后对 AI 说"教我 X"、“我想学 X 但只懂 Y"、“考考我 X"、“看看我笔记里学没学过 X"、“继续上次学的 X"即可触发。
 
+## 配置：自定义知识库
+
+在 skill 目录下把 `config.example.json` 复制为 `config.json` 并修改即可（`config.json` 已被 gitignore，升级 skill 不冲突；不配置则自动检测）。优先级：会话内口头指定 > config.json > 自动检测。
+
+| 字段 | 取值 | 说明 |
+|---|---|---|
+| `backend` | `auto`（默认）/ `obsidian` / `directory` / `none` | `auto` 依次尝试 Obsidian CLI → 目录；显式指定后不再检测 |
+| `obsidian.vault` | vault 名 | **多 vault 用户务必填写**——不填会写进"最近聚焦"的库 |
+| `obsidian.folder` | 文件夹名（如 `成长/学习`） | 学习档案与验收笔记统一存入，留空 = 库根目录 |
+| `directory.path` | 绝对路径 | 任意本地 markdown 目录（Notion/语雀导出均可） |
+| `auto_write` | `true`（默认）/ `false` | `false` 时每次写入前先展示内容，确认后才写 |
+
+```json
+{
+  "backend": "obsidian",
+  "obsidian": { "vault": "ObsidianVault", "folder": "成长/学习" },
+  "auto_write": true
+}
+```
+
+仓库文件：`SKILL.md`（skill 本体）· `config.example.json`（配置模板）· `.gitignore`（忽略用户配置）
+
 ## Changelog
 
+- **v1.3**（2026-10-08）：知识库可配置——`config.json` 自定义后端/多 vault/存储文件夹/写前确认，config 被 gitignore 升级不冲突，口头指定可临时覆盖
 - **v1.2**（2026-10-08）：笔记系统集成——后端三级检测（Obsidian CLI / 本地 markdown 目录 / 无后端降级）、自动记验收笔记与学习档案、笔记摸底+脱稿抽查兑换"已掌握"；新增硬规则"笔记不能免验收"
 - **v1.1**（2026-10-08）：跨会话学习档案、复述闸门（拒绝"差不多"）、费曼反剧透与打分锚点、无材料时事实降置信、D 模式退出条件
 - **v1.0**（2026-10-08）：四模式 + 五条实测硬规则，首轮发布

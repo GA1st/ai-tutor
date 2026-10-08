@@ -1,0 +1,18 @@
+{
+  "_说明": "把本文件复制为 config.json 后按需修改。config.json 已被 gitignore，升级 skill 不会冲突。不想配的项直接删掉或留空，即回落到自动检测。",
+  "_backend说明": "auto = 自动检测（推荐）；obsidian = 只用 Obsidian CLI；directory = 只用本地 markdown 目录；none = 不落盘，档案以文本输出",
+  "backend": "auto",
+  "obsidian": {
+    "_说明": "仅 backend 为 auto/obsidian 时生效",
+    "vault": "",
+    "_vault说明": "留空 = CLI 默认（最近聚焦的库）。有多个 vault 的用户务必填写，否则可能写进别的库",
+    "folder": "",
+    "_folder说明": "学习档案与验收笔记存入的文件夹名（如 \"成长/学习\"），留空 = 库根目录"
+  },
+  "directory": {
+    "_说明": "仅 backend 为 auto/directory 时生效。auto 模式下留空则跳过目录后端",
+    "path": ""
+  },
+  "auto_write": true,
+  "_auto_write说明": "true = 直接写入并一句话告知；false = 每次写入前先展示内容，你确认后才写"
+}
